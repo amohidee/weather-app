@@ -1,5 +1,5 @@
 from unicodedata import name
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 
 import datetime
 import json
@@ -23,10 +23,12 @@ def weather():
 @app.route('/<name>')
 def index(name):
 
+    fail_data = {'temp': "N/A"}
+
     try: 
         coords1 = client.geocode(name)
     except Exception as e:
-        return render_template('index.html', utc_dt=datetime.datetime.utcnow(), s_temp="N/A", city="CITY_NOT_FOUND")
+        return jsonify(fail_data), 400
     lat1 = coords1["results"][0]["location"]["lat"]
     long1 = coords1["results"][0]["location"]["lng"]
     print(name)
@@ -46,4 +48,5 @@ def index(name):
     print(address["results"][0]["address_components"]["city"])
     address_city = address["results"][0]["address_components"]["city"]
 
-    return render_template('index.html', utc_dt=datetime.datetime.utcnow(), s_temp=s_temp1, city=address_city)
+    data = {'temp': s_temp1}
+    return jsonify(data), 200
