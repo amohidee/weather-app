@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, jsonify
 
 import datetime
 import json
+import pymysql.cursors
 import requests
 import urllib.request
 from geocodio import GeocodioClient
@@ -10,6 +11,37 @@ from geocodio import GeocodioClient
 app = Flask(__name__)
 
 client = GeocodioClient("8186a8b0b162662bc0c06ca6cab28a88b6b661b")
+
+connection = pymysql.connect(host='db-mysql-sfo3-58736-do-user-11604989-0.b.db.ondigitalocean.com',
+                             user='doadmin',
+                             password='AVNS_ExpNP5wFgHnMVqd',
+                             database='todoapp',
+                             port=25060,
+                             charset='utf8mb4',
+                             cursorclass=pymysql.cursors.DictCursor)
+
+with connection:
+    with connection.cursor() as cursor:
+        # Read a single record
+        sql = "SELECT * FROM weathertable"
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        citylist = []
+        for i in range(len(result)):
+            citylist.append(result[i]['city'])
+        print(citylist)
+
+        for i in range(len(result)):
+            city = result[i]['city']
+            response = requests.get("https://oyster-app-rh2np.ondigitalocean.app/" + city)
+            temp = response.json()["temp"]
+            forecast = response.json()["forecast"]
+            sql = "UPDATE weathertable SET temp = %s, forecast = %s WHERE city = %s"
+            cursor.execute(sql, (temp, forecast, city))
+
+    # connection is not autocommit by default. So you must commit to save
+    # your changes.
+    connection.commit()
 
 """
 @app.route('/')
@@ -19,6 +51,7 @@ def weather():
     s = str(temp)
     return s
 """
+
 
 @app.route('/<name>')
 def index(name):
