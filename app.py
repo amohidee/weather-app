@@ -23,7 +23,7 @@ def weather():
 @app.route('/<name>')
 def index(name):
 
-    fail_data = {'temp': "N/A"}
+    fail_data = {'temp': "N/A", 'forecast': 'N/A'}
 
     try: 
         coords1 = client.geocode(name)
@@ -41,12 +41,15 @@ def index(name):
     response1 = requests.get(gp_response1)
     print("TEMPERATURE")
     print(response1.json()['properties']['periods'][0]['temperature'])
+    
     temp1 = response1.json()['properties']['periods'][0]['temperature']
     s_temp1 = str(temp1)
+
+    forecast1 = response1.json()['properties']['periods'][0]['detailedForecast']
 
     address = client.reverse((lat1, long1))
     print(address["results"][0]["address_components"]["city"])
     address_city = address["results"][0]["address_components"]["city"]
 
-    data = {'temp': s_temp1}
+    data = {'temp': s_temp1, 'forecast': forecast1}
     return jsonify(data), 200
