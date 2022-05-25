@@ -88,9 +88,6 @@ def index(name):
 
     forecast1 = response1.json()['properties']['periods'][0]['detailedForecast']
 
-    address = client.reverse((lat1, long1))
-    address_city = address["results"][0]["address_components"]["city"]
-
     data = {'temp': s_temp1, 'forecast': forecast1}
     return jsonify(data), 200
 
@@ -119,9 +116,6 @@ def index2(name):
     s_temp1 = str(temp1)
 
     forecast1 = response1.json()['properties']['periods'][0]['detailedForecast']
-
-    address = client.reverse((lat1, long1))
-    address_city = address["results"][0]["address_components"]["city"]
 
     data = {'temp': s_temp1, 'forecast': forecast1}
     return data
