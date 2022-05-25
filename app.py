@@ -28,15 +28,6 @@ with connection:
         for i in range(len(result)):
             citylist.append(result[i]['city'])
 
-        for i in range(len(result)):
-            city = result[i]['city']
-            response = requests.get("https://oyster-app-rh2np.ondigitalocean.app/" + city)
-            temp = response.json()["temp"]
-            forecast = response.json()["forecast"]
-            print(forecast)
-            sql = "UPDATE weathertable SET temp = %s, forecast = %s WHERE city = %s"
-            cursor.execute(sql, (temp, forecast, city))
-
     # connection is not autocommit by default. So you must commit to save
     # your changes.
     connection.commit()
