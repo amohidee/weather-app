@@ -6,13 +6,10 @@ import json
 import pymysql.cursors
 import requests
 import urllib.request
-from geocodio import GeocodioClient
 
 app = Flask(__name__)
 
 citylist = []
-
-client = GeocodioClient("8186a8b0b162662bc0c06ca6cab28a88b6b661b")
 
 connection = pymysql.connect(host='db-mysql-sfo3-58736-do-user-11604989-0.b.db.ondigitalocean.com',
                              user='doadmin',
@@ -71,20 +68,20 @@ def favcities():
 @app.route('/<name>')
 def index(name):
     fail_data = {'temp': "N/A", 'forecast': 'N/A'}
-
+    url = "https://open.mapquestapi.com/geocoding/v1/address?key=A9AWLA8Gm8L5c5KtZ5IT82dhGlO2iZAw&location=" + name
     try:
-        coords1 = client.geocode(name)
+        cds1 = requests.get(url)
     except Exception as e:
         return jsonify(fail_data), 400
-    lat1 = coords1["results"][0]["location"]["lat"]
-    long1 = coords1["results"][0]["location"]["lng"]
+    if cds1.json()["results"][0]["locations"][0]["adminArea5"] == "":
+        return jsonify(fail_data), 400
+    lat1 = cds1.json()["results"][0]["locations"][0]["latLng"]["lat"]
+    long1 = cds1.json()["results"][0]["locations"][0]["latLng"]["lng"]
 
     gridpts = requests.get("https://api.weather.gov/points/" + str(lat1) + "," + str(long1))
-    print(gridpts.json()["properties"]["forecast"])
     gp_response1 = gridpts.json()["properties"]["forecast"]
     response1 = requests.get(gp_response1)
     print_temp = str(response1.json()['properties']['periods'][0]['temperature'])
-    print("TEMPERATURE: " + print_temp)
 
     temp1 = response1.json()['properties']['periods'][0]['temperature']
     s_temp1 = str(temp1)
@@ -101,12 +98,15 @@ def index(name):
 def index2(name):
     fail_data = {'temp': "N/A", 'forecast': 'N/A'}
 
+    url = "https://open.mapquestapi.com/geocoding/v1/address?key=A9AWLA8Gm8L5c5KtZ5IT82dhGlO2iZAw&location=" + name
     try:
-        coords1 = client.geocode(name)
+        cds1 = requests.get(url)
     except Exception as e:
-        return fail_data
-    lat1 = coords1["results"][0]["location"]["lat"]
-    long1 = coords1["results"][0]["location"]["lng"]
+        return jsonify(fail_data), 400
+    if cds1.json()["results"][0]["locations"][0]["adminArea5"] == "":
+        return jsonify(fail_data), 400
+    lat1 = cds1.json()["results"][0]["locations"][0]["latLng"]["lat"]
+    long1 = cds1.json()["results"][0]["locations"][0]["latLng"]["lng"]
 
     gridpts = requests.get("https://api.weather.gov/points/" + str(lat1) + "," + str(long1))
     print(gridpts.json()["properties"]["forecast"])
