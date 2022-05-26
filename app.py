@@ -1,36 +1,12 @@
 from unicodedata import name
 from flask import Flask, render_template, request, jsonify
 
-import datetime
 import json
 import pymysql.cursors
 import requests
 import urllib.request
 
 app = Flask(__name__)
-
-citylist = []
-
-connection = pymysql.connect(host='db-mysql-sfo3-58736-do-user-11604989-0.b.db.ondigitalocean.com',
-                             user='doadmin',
-                             password='AVNS_ExpNP5wFgHnMVqd',
-                             database='todoapp',
-                             port=25060,
-                             charset='utf8mb4',
-                             cursorclass=pymysql.cursors.DictCursor)
-
-with connection:
-    with connection.cursor() as cursor:
-        # Read a single record
-        sql = "SELECT * FROM weathertable"
-        cursor.execute(sql)
-        result = cursor.fetchall()
-        for i in range(len(result)):
-            citylist.append(result[i]['city'])
-
-    # connection is not autocommit by default. So you must commit to save
-    # your changes.
-    connection.commit()
 
 """
 @app.route('/')
@@ -44,6 +20,23 @@ def weather():
 
 @app.route('/favorite-cities')
 def favcities():
+    citylist = []
+    connection = pymysql.connect(host='db-mysql-sfo3-58736-do-user-11604989-0.b.db.ondigitalocean.com',
+                                 user='doadmin',
+                                 password='AVNS_ExpNP5wFgHnMVqd',
+                                 database='todoapp',
+                                 port=25060,
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.DictCursor)
+
+    with connection:
+        with connection.cursor() as cursor:
+            # Read a single record
+            sql = "SELECT * FROM weathertable"
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            for i in range(len(result)):
+                citylist.append(result[i]['city'])
     print(citylist)
     temp_data = {}
     for c in citylist:
@@ -53,6 +46,7 @@ def favcities():
         temp_data[c] = temp_get
     print(temp_data)
     response1 = jsonify(temp_data)
+
     return response1
 
 
