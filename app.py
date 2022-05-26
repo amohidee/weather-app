@@ -58,15 +58,20 @@ def favcities():
 @app.route('/<name>')
 def index(name):
     fail_data = {'temp': "N/A", 'forecast': 'N/A'}
-    url = "https://open.mapquestapi.com/geocoding/v1/address?key=A9AWLA8Gm8L5c5KtZ5IT82dhGlO2iZAw&location=" + name
+    name1 = name.split();
+    name_url = '+'.join(name1)
+    url = "https://open.mapquestapi.com/geocoding/v1/address?key=A9AWLA8Gm8L5c5KtZ5IT82dhGlO2iZAw&location=" + name_url
     try:
         cds1 = requests.get(url)
     except Exception as e:
         return jsonify(fail_data), 400
-    if cds1.json()["results"][0]["locations"][0]["adminArea5"] == "":
-        return jsonify(fail_data), 400
+
     lat1 = cds1.json()["results"][0]["locations"][0]["latLng"]["lat"]
     long1 = cds1.json()["results"][0]["locations"][0]["latLng"]["lng"]
+
+    # Check if data is the default fail output lat/lng
+    if lat1 == 39.78373 and long1 == -100.445882:
+        return fail_data
 
     gridpts = requests.get("https://api.weather.gov/points/" + str(lat1) + "," + str(long1))
     gp_response1 = gridpts.json()["properties"]["forecast"]
