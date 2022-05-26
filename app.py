@@ -41,13 +41,14 @@ def favcities():
     temp_data = {}
     for c in citylist:
         temp_get = index2(c)['temp']
-        temp_data[c] = temp_get
+        forecast_get = index2(c)['forecast']
+        temp_data[c] = [temp_get, forecast_get]
     print(temp_data)
     favList = []
     for city in temp_data:
-        temp = temp_data[city]
-        print(city, temp)
-        obj = {"city": city, "temp": temp}
+        temp = temp_data[city][0]
+        forecast = temp_data[city][1]
+        obj = {"city": city, "temp": temp, "forecast": forecast}
         favList.append(obj)
 
     response1 = jsonify(favList)
@@ -92,7 +93,6 @@ def index2(name):
     name1 = name.split();
     name_url = '+'.join(name1)
     url = "https://open.mapquestapi.com/geocoding/v1/address?key=A9AWLA8Gm8L5c5KtZ5IT82dhGlO2iZAw&location=" + name_url
-    print(url)
     try:
         cds1 = requests.get(url)
     except Exception as e:
@@ -106,6 +106,7 @@ def index2(name):
         return fail_data
 
     gridpts = requests.get("https://api.weather.gov/points/" + str(lat1) + "," + str(long1))
+    print("https://api.weather.gov/points/" + str(lat1) + "," + str(long1))
     gp_response1 = gridpts.json()["properties"]["forecast"]
     response1 = requests.get(gp_response1)
 
@@ -116,3 +117,4 @@ def index2(name):
 
     data = {'temp': s_temp1, 'forecast': forecast1}
     return data
+
