@@ -40,15 +40,18 @@ def favcities():
     print(citylist)
     temp_data = {}
     for c in citylist:
-        temp_get = index2(c)['temp']
-        forecast_get = index2(c)['forecast']
-        temp_data[c] = [temp_get, forecast_get]
+        index_get = index2(c)
+        temp_get = index_get['temp']
+        forecast_get = index_get['forecast']
+        short_get = index_get['short_forecast']
+        temp_data[c] = [temp_get, forecast_get, short_get]
     print(temp_data)
     favList = []
     for city in temp_data:
         temp = temp_data[city][0]
         forecast = temp_data[city][1]
-        obj = {"city": city, "temp": temp, "forecast": forecast}
+        short = temp_data[city][2]
+        obj = {"city": city, "temp": temp, "forecast": forecast, "short_forcast": short}
         favList.append(obj)
 
     response1 = jsonify(favList)
@@ -58,7 +61,7 @@ def favcities():
 
 @app.route('/<name>')
 def index(name):
-    fail_data = {'temp': "N/A", 'forecast': 'N/A'}
+    fail_data = {'temp': "N/A", 'forecast': 'N/A', 'short_forecast': 'N/A'}
     name1 = name.split();
     name_url = '+'.join(name1)
     url = "https://open.mapquestapi.com/geocoding/v1/address?key=A9AWLA8Gm8L5c5KtZ5IT82dhGlO2iZAw&location=" + name_url
@@ -84,12 +87,14 @@ def index(name):
 
     forecast1 = response1.json()['properties']['periods'][0]['detailedForecast']
 
-    data = {'temp': s_temp1, 'forecast': forecast1}
+    short1 = response1.json()['properies']['periods'][0]['shortForecast']
+
+    data = {'temp': s_temp1, 'forecast': forecast1, 'short_forecast': short1}
     return jsonify(data), 200
 
 
 def index2(name):
-    fail_data = {'temp': "N/A", 'forecast': 'N/A'}
+    fail_data = {'temp': "N/A", 'forecast': 'N/A', 'short_forecast': 'N/A'}
     name1 = name.split();
     name_url = '+'.join(name1)
     url = "https://open.mapquestapi.com/geocoding/v1/address?key=A9AWLA8Gm8L5c5KtZ5IT82dhGlO2iZAw&location=" + name_url
@@ -115,6 +120,8 @@ def index2(name):
 
     forecast1 = response1.json()['properties']['periods'][0]['detailedForecast']
 
-    data = {'temp': s_temp1, 'forecast': forecast1}
+    short1 = response1.json()['properties']['periods'][0]['shortForecast']
+
+    data = {'temp': s_temp1, 'forecast': forecast1, 'short_forecast': short1}
     return data
 
