@@ -79,6 +79,7 @@ def index(name):
 
     gridpts = requests.get("https://api.weather.gov/points/" + str(lat1) + "," + str(long1))
     gp_response1 = gridpts.json()["properties"]["forecast"]
+    print(gp_response1)
     response1 = requests.get(gp_response1)
     print_temp = str(response1.json()['properties']['periods'][0]['temperature'])
 
@@ -87,7 +88,7 @@ def index(name):
 
     forecast1 = response1.json()['properties']['periods'][0]['detailedForecast']
 
-    short1 = response1.json()['properies']['periods'][0]['shortForecast']
+    short1 = response1.json()['properties']['periods'][0]['shortForecast']
 
     data = {'temp': s_temp1, 'forecast': forecast1, 'short_forecast': short1}
     return jsonify(data), 200
